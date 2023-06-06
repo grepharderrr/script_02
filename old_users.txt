@@ -1,0 +1,26 @@
+# Import Active Directory module
+Import-Module ActiveDirectory
+
+# Get the date 120 days ago
+$dateCutoff = (Get-Date).AddDays(-120)
+
+# Get all AD users
+$users = Get-ADUser -Filter * -Property LastLogonDate
+
+# Loop through all users
+foreach ($user in $users)
+{
+    # If the user has never logged on, skip to the next user
+    if ($user.LastLogonDate -eq $null)
+    {
+        continue
+    }
+
+    # If the user last logged on more than 120 days ago, remove the user
+    if ($user.LastLogonDate -lt $dateCutoff)
+    {
+        # Uncomment below line to delete the user. Be sure of this action before doing so.
+        # Remove-ADUser -Identity $user.SamAccountName -Confirm:$false
+        Write-Host "User $($user.SamAccountName) would be deleted"
+    }
+}
